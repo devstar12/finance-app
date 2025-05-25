@@ -1,5 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/Button';
 
 interface LoginFormData {
@@ -9,6 +10,7 @@ interface LoginFormData {
 
 const Login = () => {
   const navigate = useNavigate();
+  const { onLogin } = useAuth();
 
   const {
     register,
@@ -16,10 +18,14 @@ const Login = () => {
     formState: { errors },
   } = useForm<LoginFormData>();
 
-  const onSubmit = (data: LoginFormData) => {
-    console.log('Login success:', data);
-    // TODO: Replace with actual auth logic (API/Firebase etc.)
-    navigate('/');
+  const onSubmit = async (data: LoginFormData) => {
+    try {
+      await onLogin(data.email, data.password);
+      console.log('Login success');
+      navigate('/');
+    } catch (error) {
+      console.error('Login failed:', error);
+    }
   };
 
   return (

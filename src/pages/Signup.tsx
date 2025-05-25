@@ -1,5 +1,6 @@
 import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../contexts/AuthContext';
 import Checkbox from '../components/Checkbox';
 
 interface FormData {
@@ -12,6 +13,7 @@ interface FormData {
 
 const Signup = () => {
   const navigate = useNavigate();
+  const { onRegister } = useAuth();
   const {
     register,
     handleSubmit,
@@ -19,10 +21,14 @@ const Signup = () => {
     formState: { errors },
   } = useForm<FormData>();
 
-  const onSubmit = (data: FormData) => {
-    console.log('Signup success:', data);
-    // Save or submit data here (e.g. API call)
-    navigate('/login');
+  const onSubmit = async (data: FormData) => {
+    try {
+      await onRegister(data.fullName, data.email, data.password);
+      console.log('Signup success');
+      navigate('/login');
+    } catch (error) {
+      console.error('Signup failed:', error);
+    }
   };
 
   return (
