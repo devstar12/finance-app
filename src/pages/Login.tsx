@@ -23,7 +23,7 @@ const Login = () => {
     try {
       await onLogin(data.email, data.password);
       toast.success('Login successful!');
-      navigate('/');
+      navigate('/dashboard');
     } catch (error) {
       console.error('Login failed:', error);
       toast.error('Login failed. Please check your credentials.');

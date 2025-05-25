@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, type PropsWithChildren } from 'react';
+import { createContext, useContext, useState, useEffect, type PropsWithChildren } from 'react';
 import { type IUserProfile } from '../types/user';
-import { register as registerApi, login as loginApi } from '../apis/userApi';
+import { register as registerApi, login as loginApi, getMe } from '../apis/userApi';
 
 interface IAuthContext {
   user: IUserProfile | null;
@@ -22,7 +22,33 @@ const AuthContext = createContext(defaultAuthContext);
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [user, setUser] = useState<IUserProfile | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(() => localStorage.getItem('token'));
+
+  // Save token to localStorage whenever it changes
+  useEffect(() => {
+    if (token) {
+      localStorage.setItem('token', token);
+    } else {
+      localStorage.removeItem('token');
+    }
+  }, [token]);
+
+  // Fetch user profile if token exists
+  useEffect(() => {
+    const fetchUser = async () => {
+      if (token) {
+        try {
+          const userProfile = await getMe();
+          setUser(userProfile);
+        } catch (error) {
+          console.error('Failed to fetch user profile:', error);
+          setToken(null);
+          setUser(null);
+        }
+      }
+    };
+    fetchUser();
+  }, [token]);
 
   const handleRegister = async (fullName: string, email: string, password: string) => {
     try {
@@ -49,6 +75,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   const handleLogout = () => {
     setUser(null);
     setToken(null);
+    localStorage.removeItem('token');
   };
 
   const value = {
