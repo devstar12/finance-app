@@ -1,3 +1,6 @@
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 import AuthProvider from './contexts/AuthContext'
 import { BrowserRouter, Route, Routes } from 'react-router-dom'
 import ProtectedRoute from './contexts/ProtectedRoute'
@@ -26,6 +29,7 @@ function App() {
           {/* <Route path="*" element={<NotFound />} /> */}
         </Routes>
       </BrowserRouter>
+      <ToastContainer />
     </AuthProvider>
   )
 }

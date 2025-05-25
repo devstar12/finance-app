@@ -25,15 +25,25 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
   const [token, setToken] = useState<string | null>(null);
 
   const handleRegister = async (fullName: string, email: string, password: string) => {
-    const response = await registerApi({ fullName, email, password });
-    setUser(response.user);
-    setToken(response.token);
+    try {
+      const response = await registerApi({ fullName, email, password });
+      setUser(response.user);
+      setToken(response.token);
+    } catch (error) {
+      console.error('Registration failed:', error);
+      throw error;
+    }
   };
 
   const handleLogin = async (email: string, password: string) => {
-    const response = await loginApi({ email, password });
-    setUser(response.user);
-    setToken(response.token);
+    try {
+      const response = await loginApi({ email, password });
+      setUser(response.user);
+      setToken(response.token);
+    } catch (error) {
+      console.error('Login failed:', error);
+      throw error;
+    }
   };
 
   const handleLogout = () => {

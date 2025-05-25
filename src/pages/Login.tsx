@@ -2,6 +2,7 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Button from '../components/Button';
+import { toast } from 'react-toastify';
 
 interface LoginFormData {
   email: string;
@@ -21,10 +22,11 @@ const Login = () => {
   const onSubmit = async (data: LoginFormData) => {
     try {
       await onLogin(data.email, data.password);
-      console.log('Login success');
+      toast.success('Login successful!');
       navigate('/');
     } catch (error) {
       console.error('Login failed:', error);
+      toast.error('Login failed. Please check your credentials.');
     }
   };
 

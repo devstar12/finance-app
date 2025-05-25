@@ -2,6 +2,7 @@ import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import Checkbox from '../components/Checkbox';
+import { toast } from 'react-toastify';
 
 interface FormData {
   fullName: string;
@@ -24,10 +25,11 @@ const Signup = () => {
   const onSubmit = async (data: FormData) => {
     try {
       await onRegister(data.fullName, data.email, data.password);
-      console.log('Signup success');
+      toast.success('Signup successful! Please log in.');
       navigate('/login');
     } catch (error) {
       console.error('Signup failed:', error);
+      toast.error('Signup failed. Please try again.');
     }
   };
 

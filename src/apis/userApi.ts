@@ -18,17 +18,35 @@ interface AuthResponse {
   user: IUserProfile;
 }
 
+// Register API call
 export const register = async (data: RegisterPayload): Promise<AuthResponse> => {
-  const response = await api.post<AuthResponse>('/api/users/register', data);
-  return response.data;
+  try {
+    const response = await api.post<AuthResponse>('/api/users/register', data);
+    return response.data;
+  } catch (error) {
+    console.error('Register API error:', error);
+    throw error;
+  }
 };
 
+// Login API call
 export const login = async (data: LoginPayload): Promise<AuthResponse> => {
-  const response = await api.post<AuthResponse>('/api/users/login', data);
-  return response.data;
+  try {
+    const response = await api.post<AuthResponse>('/api/users/login', data);
+    return response.data;
+  } catch (error) {
+    console.error('Login API error:', error);
+    throw error;
+  }
 };
 
+// Get current user profile
 export const getMe = async (): Promise<IUserProfile> => {
-  const response = await api.get<IUserProfile>('/api/users/getMe');
-  return response.data;
+  try {
+    const response = await api.get<IUserProfile>('/api/users/getMe');
+    return response.data;
+  } catch (error) {
+    console.error('GetMe API error:', error);
+    throw error;
+  }
 };
