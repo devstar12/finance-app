@@ -1,5 +1,6 @@
-import { useState, type ChangeEvent, type FormEvent } from 'react';
+import { useForm, Controller } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import Checkbox from '../components/Checkbox';
 
 interface FormData {
   fullName: string;
@@ -9,66 +10,25 @@ interface FormData {
   acceptTerms: boolean;
 }
 
-interface FormErrors {
-  fullName?: string;
-  email?: string;
-  password?: string;
-  confirmPassword?: string;
-  acceptTerms?: string;
-}
-
 const Signup = () => {
   const navigate = useNavigate();
+  const {
+    register,
+    handleSubmit,
+    control,
+    formState: { errors },
+  } = useForm<FormData>();
 
-  const [formData, setFormData] = useState<FormData>({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    acceptTerms: false,
-  });
-
-  const [errors, setErrors] = useState<FormErrors>({});
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
-  };
-
-  const validate = (): FormErrors => {
-    const newErrors: FormErrors = {};
-
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    if (!formData.password) newErrors.password = 'Password is required';
-    if (formData.password.length < 6)
-      newErrors.password = 'Password must be at least 6 characters';
-    if (formData.password !== formData.confirmPassword)
-      newErrors.confirmPassword = 'Passwords do not match';
-    if (!formData.acceptTerms) newErrors.acceptTerms = 'You must accept the terms';
-
-    return newErrors;
-  };
-
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    const formErrors = validate();
-    if (Object.keys(formErrors).length === 0) {
-      console.log('Signup success:', formData);
-      // Save or submit data here (e.g. API call)
-      navigate('/login');
-    } else {
-      setErrors(formErrors);
-    }
+  const onSubmit = (data: FormData) => {
+    console.log('Signup success:', data);
+    // Save or submit data here (e.g. API call)
+    navigate('/login');
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center px-4">
       <form
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         className="bg-white shadow-lg rounded p-6 w-full max-w-md space-y-4"
       >
         <h2 className="text-2xl font-bold text-center">Create Account</h2>
@@ -76,70 +36,77 @@ const Signup = () => {
         <div>
           <input
             type="text"
-            name="fullName"
             placeholder="Full Name"
-            value={formData.fullName}
-            onChange={handleChange}
+            {...register('fullName', { required: 'Full name is required' })}
             className="w-full border p-2 rounded"
           />
-          {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName}</p>}
+          {errors.fullName && <p className="text-red-500 text-sm">{errors.fullName.message}</p>}
         </div>
 
         <div>
           <input
             type="email"
-            name="email"
             placeholder="Email Address"
-            value={formData.email}
-            onChange={handleChange}
+            {...register('email', { required: 'Email is required' })}
             className="w-full border p-2 rounded"
           />
-          {errors.email && <p className="text-red-500 text-sm">{errors.email}</p>}
+          {errors.email && <p className="text-red-500 text-sm">{errors.email.message}</p>}
         </div>
 
         <div>
           <input
             type="password"
-            name="password"
             placeholder="Password"
-            value={formData.password}
-            onChange={handleChange}
+            {...register('password', {
+              required: 'Password is required',
+              minLength: { value: 6, message: 'Password must be at least 6 characters' },
+            })}
             className="w-full border p-2 rounded"
           />
-          {errors.password && <p className="text-red-500 text-sm">{errors.password}</p>}
+          {errors.password && <p className="text-red-500 text-sm">{errors.password.message}</p>}
         </div>
 
         <div>
           <input
             type="password"
-            name="confirmPassword"
             placeholder="Confirm Password"
-            value={formData.confirmPassword}
-            onChange={handleChange}
+            {...register('confirmPassword', {
+              required: 'Confirm password is required',
+              validate: (value, { password }) =>
+                value === password || 'Passwords do not match',
+            })}
             className="w-full border p-2 rounded"
           />
           {errors.confirmPassword && (
-            <p className="text-red-500 text-sm">{errors.confirmPassword}</p>
+            <p className="text-red-500 text-sm">{errors.confirmPassword.message}</p>
           )}
         </div>
 
         <div className="flex items-center">
-          <input
-            type="checkbox"
+          <Controller
             name="acceptTerms"
-            checked={formData.acceptTerms}
-            onChange={handleChange}
-            className="mr-2"
+            control={control}
+            defaultValue={false}
+            rules={{ required: 'You must accept the terms' }}
+            render={({ field }) => (
+              <Checkbox
+                id="acceptTerms"
+                label={
+                  <>
+                    I accept the{' '}
+                    <a href="/terms" className="text-blue-600 underline">
+                      Terms & Conditions
+                    </a>
+                  </>
+                }
+                checked={field.value}
+                onChange={field.onChange}
+              />
+            )}
           />
-          <label htmlFor="acceptTerms" className="text-sm">
-            I accept the{' '}
-            <a href="/terms" className="text-blue-600 underline">
-              Terms & Conditions
-            </a>
-          </label>
         </div>
         {errors.acceptTerms && (
-          <p className="text-red-500 text-sm">{errors.acceptTerms}</p>
+          <p className="text-red-500 text-sm">{errors.acceptTerms.message}</p>
         )}
 
         <button
