@@ -43,7 +43,7 @@ export const login = async (data: LoginPayload): Promise<AuthResponse> => {
 // Get current user profile
 export const getMe = async (): Promise<IUserProfile> => {
   try {
-    const response = await api.get<IUserProfile>('/api/users/getMe');
+    const response = await api.get<IUserProfile>('/api/users/me');
     return response.data;
   } catch (error) {
     console.error('GetMe API error:', error);
